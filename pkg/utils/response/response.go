@@ -28,6 +28,10 @@ func Created(c *gin.Context, message string, data any) {
 	})
 }
 
+func NoContent(c *gin.Context) {
+	c.JSON(http.StatusNoContent, nil)
+}
+
 func BadRequest(c *gin.Context, message string) {
 	c.JSON(http.StatusBadRequest, gin.H{
 		"code":    http.StatusBadRequest,

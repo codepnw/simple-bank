@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	user "github.com/codepnw/simple-bank/internal/features/user"
+	database "github.com/codepnw/simple-bank/pkg/database"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -66,16 +67,59 @@ func (mr *MockUserRepositoryMockRecorder) FindByID(ctx, id interface{}) *gomock.
 }
 
 // Insert mocks base method.
-func (m *MockUserRepository) Insert(ctx context.Context, input *user.User) (*user.User, error) {
+func (m *MockUserRepository) Insert(ctx context.Context, db database.DBExec, input *user.User) (*user.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Insert", ctx, input)
+	ret := m.ctrl.Call(m, "Insert", ctx, db, input)
 	ret0, _ := ret[0].(*user.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Insert indicates an expected call of Insert.
-func (mr *MockUserRepositoryMockRecorder) Insert(ctx, input interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) Insert(ctx, db, input interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockUserRepository)(nil).Insert), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockUserRepository)(nil).Insert), ctx, db, input)
+}
+
+// RevokedRefreshToken mocks base method.
+func (m *MockUserRepository) RevokedRefreshToken(ctx context.Context, db database.DBExec, token string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokedRefreshToken", ctx, db, token)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokedRefreshToken indicates an expected call of RevokedRefreshToken.
+func (mr *MockUserRepositoryMockRecorder) RevokedRefreshToken(ctx, db, token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokedRefreshToken", reflect.TypeOf((*MockUserRepository)(nil).RevokedRefreshToken), ctx, db, token)
+}
+
+// SaveRefreshToken mocks base method.
+func (m *MockUserRepository) SaveRefreshToken(ctx context.Context, db database.DBExec, input *user.Auth) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveRefreshToken", ctx, db, input)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveRefreshToken indicates an expected call of SaveRefreshToken.
+func (mr *MockUserRepositoryMockRecorder) SaveRefreshToken(ctx, db, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveRefreshToken", reflect.TypeOf((*MockUserRepository)(nil).SaveRefreshToken), ctx, db, input)
+}
+
+// ValidateRefreshToken mocks base method.
+func (m *MockUserRepository) ValidateRefreshToken(ctx context.Context, token string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ValidateRefreshToken", ctx, token)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ValidateRefreshToken indicates an expected call of ValidateRefreshToken.
+func (mr *MockUserRepositoryMockRecorder) ValidateRefreshToken(ctx, token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateRefreshToken", reflect.TypeOf((*MockUserRepository)(nil).ValidateRefreshToken), ctx, token)
 }

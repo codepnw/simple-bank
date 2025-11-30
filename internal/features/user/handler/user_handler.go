@@ -76,3 +76,57 @@ func (h *userHandler) Login(c *gin.Context) {
 	}
 	response.Success(c, "", data)
 }
+
+func (h *userHandler) RefreshToken(c *gin.Context) {
+	req := new(RefreshTokenReq)
+	if err := c.ShouldBindJSON(req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+	if err := validate.Struct(req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+
+	data, err := h.uc.RefreshToken(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		switch err {
+		case errs.ErrTokenNotFound:
+			response.NotFound(c, err.Error())
+			return
+		case errs.ErrTokenRevoked:
+			response.BadRequest(c, err.Error())
+			return
+		case errs.ErrTokenExpires:
+			response.BadRequest(c, err.Error())
+			return
+		default:
+			response.InternalServerError(c, err)
+			return
+		}
+	}
+	response.Success(c, "", data)
+}
+
+func (h *userHandler) Logout(c *gin.Context) {
+	req := new(RefreshTokenReq)
+	if err := c.ShouldBindJSON(req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+	if err := validate.Struct(req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+
+	err := h.uc.Logout(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		if errors.Is(err, errs.ErrTokenNotFound) {
+			response.NotFound(c, err.Error())
+			return
+		}
+		response.InternalServerError(c, err)
+		return
+	}
+	response.NoContent(c)
+}

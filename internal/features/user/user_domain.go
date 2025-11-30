@@ -12,3 +12,13 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type Auth struct {
+	ID        int64
+	UserID    int64
+	Token     string
+	Revoked   bool
+	ExpiresAt time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

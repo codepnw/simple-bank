@@ -8,12 +8,14 @@ import (
 
 func (cfg *routesConfig) registerUserRoutes() {
 	repo := userrepository.NewUserRepository(cfg.db)
-	uc := userusecase.NewUserUsecase(repo, cfg.token)
+	uc := userusecase.NewUserUsecase(repo, cfg.token, cfg.tx)
 	handler := userhandler.NewUserHandler(uc)
 
 	public := cfg.router.Group("/auth")
 	{
 		public.POST("/register", handler.Register)
 		public.POST("/login", handler.Login)
+		public.POST("/refresh-token", handler.RefreshToken)
+		public.POST("/logout", handler.Logout)
 	}
 }

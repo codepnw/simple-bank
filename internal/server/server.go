@@ -14,6 +14,7 @@ type routesConfig struct {
 	db     *sql.DB
 	router *gin.Engine
 	token  *jwt.JWTToken
+	tx     database.TxManager
 }
 
 func Run(cfg *config.EnvConfig) error {
@@ -30,6 +31,10 @@ func Run(cfg *config.EnvConfig) error {
 		return err
 	}
 
+	// New Transaction
+	tx := database.NewTransaction(db)
+
+	// New Router
 	r := gin.New()
 	r.GET("/health", func(c *gin.Context) {
 		response.Success(c, "server running...", nil)
@@ -40,6 +45,7 @@ func Run(cfg *config.EnvConfig) error {
 		router: r,
 		token:  token,
 		db:     db,
+		tx:     tx,
 	}
 	routes.registerUserRoutes()
 

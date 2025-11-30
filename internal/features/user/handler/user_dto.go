@@ -9,6 +9,10 @@ type RegisterReq struct {
 }
 
 type LoginReq struct {
-	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required,min=6"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+}
+
+type RefreshTokenReq struct {
+	RefreshToken string `json:"refresh_token" validate:"required"`
 }
