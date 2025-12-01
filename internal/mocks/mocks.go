@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/codepnw/simple-bank/internal/features/account"
 	"github.com/codepnw/simple-bank/internal/features/user"
 )
 
@@ -16,9 +17,11 @@ type MockDB struct{}
 func (m *MockDB) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
 	return nil
 }
+
 func (m *MockDB) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	return nil, nil
 }
+
 func (m *MockDB) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	return nil, nil
 }
@@ -37,5 +40,14 @@ func MockUserData() *user.User {
 		LastName:  "cena",
 		Email:     "mock@example.com",
 		Password:  "password",
+	}
+}
+
+func MockAccountData() *account.Account {
+	return &account.Account{
+		ID:       10,
+		OwnerID:  10,
+		Balance:  0,
+		Currency: "THB",
 	}
 }

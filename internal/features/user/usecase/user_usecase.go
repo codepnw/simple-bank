@@ -13,7 +13,7 @@ import (
 	"github.com/codepnw/simple-bank/pkg/database"
 	"github.com/codepnw/simple-bank/pkg/jwt"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
-	"github.com/codepnw/simple-bank/pkg/utils/password"
+	"github.com/codepnw/simple-bank/pkg/utils/helper"
 )
 
 type UserUsecase interface {
@@ -41,7 +41,7 @@ func (u *userUsecase) Register(ctx context.Context, input *user.User) (*TokenRes
 	ctx, cancel := context.WithTimeout(ctx, consts.ContextTimeout)
 	defer cancel()
 
-	hashedPassword, err := password.HashedPassword(input.Password)
+	hashedPassword, err := helper.HashedPassword(input.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (u *userUsecase) Login(ctx context.Context, email, pwd string) (*TokenRespo
 		return nil, err
 	}
 
-	if err = password.ComparePassword(userData.Password, pwd); err != nil {
+	if err = helper.ComparePassword(userData.Password, pwd); err != nil {
 		return nil, errs.ErrInvalidCredentials
 	}
 
@@ -163,7 +163,6 @@ func (u *userUsecase) RefreshToken(ctx context.Context, refreshToken string) (*T
 		response = resp
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

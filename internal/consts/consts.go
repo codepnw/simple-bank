@@ -10,6 +10,7 @@ const (
 
 type contextKey string
 
+// Context Config
 const (
 	ContextTimeout = time.Second * 10
 
@@ -17,3 +18,5 @@ const (
 	ContextUserClaimsKey contextKey = "user-claims"
 	ContextUserIDKey     contextKey = "user-id"
 )
+
+const ParamAccountID = "account_id"

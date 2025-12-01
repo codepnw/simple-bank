@@ -7,7 +7,7 @@ import (
 	userusecase "github.com/codepnw/simple-bank/internal/features/user/usecase"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
 	"github.com/codepnw/simple-bank/pkg/utils/response"
-	"github.com/codepnw/simple-bank/pkg/utils/validate"
+	"github.com/codepnw/simple-bank/pkg/utils/helper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ func (h *userHandler) Register(c *gin.Context) {
 		response.BadRequest(c, err.Error())
 		return
 	}
-	if err := validate.Struct(req); err != nil {
+	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -60,7 +60,7 @@ func (h *userHandler) Login(c *gin.Context) {
 		response.BadRequest(c, err.Error())
 		return
 	}
-	if err := validate.Struct(req); err != nil {
+	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -83,7 +83,7 @@ func (h *userHandler) RefreshToken(c *gin.Context) {
 		response.BadRequest(c, err.Error())
 		return
 	}
-	if err := validate.Struct(req); err != nil {
+	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -114,7 +114,7 @@ func (h *userHandler) Logout(c *gin.Context) {
 		response.BadRequest(c, err.Error())
 		return
 	}
-	if err := validate.Struct(req); err != nil {
+	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/caarlos0/env/v11"
-	"github.com/codepnw/simple-bank/pkg/utils/validate"
+	"github.com/codepnw/simple-bank/pkg/utils/helper"
 	"github.com/joho/godotenv"
 )
 
@@ -35,7 +35,7 @@ func LoadEnv(path string) (*EnvConfig, error) {
 		return nil, fmt.Errorf("parse env failed: %w", err)
 	}
 
-	if err := validate.Struct(cfg); err != nil {
+	if err := helper.Validate(cfg); err != nil {
 		return nil, fmt.Errorf("validate env failed: %w", err)
 	}
 	return cfg, nil

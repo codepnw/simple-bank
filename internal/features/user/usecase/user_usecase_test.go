@@ -11,7 +11,7 @@ import (
 	"github.com/codepnw/simple-bank/pkg/config"
 	"github.com/codepnw/simple-bank/pkg/jwt"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
-	"github.com/codepnw/simple-bank/pkg/utils/password"
+	"github.com/codepnw/simple-bank/pkg/utils/helper"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -93,7 +93,7 @@ func TestLogin(t *testing.T) {
 				Password: "password",
 			},
 			mockFn: func(mockRepo *userrepository.MockUserRepository, input *user.User) {
-				hashedPassword, _ := password.HashedPassword(input.Password)
+				hashedPassword, _ := helper.HashedPassword(input.Password)
 				u := mocks.MockUserData()
 				u.Password = hashedPassword
 
