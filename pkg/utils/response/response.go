@@ -40,6 +40,14 @@ func BadRequest(c *gin.Context, message string) {
 	})
 }
 
+func Unauthorized(c *gin.Context, message string) {
+	c.JSON(http.StatusUnauthorized, gin.H{
+		"code":    http.StatusUnauthorized,
+		"type":    "UNAUTHORIZED",
+		"message": message,
+	})
+}
+
 func NotFound(c *gin.Context, message string) {
 	c.JSON(http.StatusNotFound, gin.H{
 		"code":    http.StatusNotFound,

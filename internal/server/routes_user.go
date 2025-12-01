@@ -11,11 +11,14 @@ func (cfg *routesConfig) registerUserRoutes() {
 	uc := userusecase.NewUserUsecase(repo, cfg.token, cfg.tx)
 	handler := userhandler.NewUserHandler(uc)
 
-	public := cfg.router.Group("/auth")
+	auth := cfg.router.Group("/auth")
 	{
-		public.POST("/register", handler.Register)
-		public.POST("/login", handler.Login)
-		public.POST("/refresh-token", handler.RefreshToken)
-		public.POST("/logout", handler.Logout)
+		// Public
+		auth.POST("/register", handler.Register)
+		auth.POST("/login", handler.Login)
+
+		// Private
+		auth.POST("/refresh-token", cfg.mid.Authorized(), handler.RefreshToken)
+		auth.POST("/logout", cfg.mid.Authorized(), handler.Logout)
 	}
 }

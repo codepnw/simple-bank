@@ -10,4 +10,5 @@ var (
 	ErrTokenNotFound         = errors.New("token not found")
 	ErrTokenRevoked          = errors.New("token revoked")
 	ErrTokenExpires          = errors.New("token is expires")
+	ErrUnauthorized          = errors.New("unauthorized")
 )
