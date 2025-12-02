@@ -6,6 +6,7 @@ package accountrepository
 
 import (
 	context "context"
+	sql "database/sql"
 	reflect "reflect"
 
 	account "github.com/codepnw/simple-bank/internal/features/account"
@@ -33,6 +34,21 @@ func NewMockAccountRepository(ctrl *gomock.Controller) *MockAccountRepository {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockAccountRepository) EXPECT() *MockAccountRepositoryMockRecorder {
 	return m.recorder
+}
+
+// AddAccountBalance mocks base method.
+func (m *MockAccountRepository) AddAccountBalance(ctx context.Context, tx *sql.Tx, accountID, amount int64) (*account.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddAccountBalance", ctx, tx, accountID, amount)
+	ret0, _ := ret[0].(*account.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddAccountBalance indicates an expected call of AddAccountBalance.
+func (mr *MockAccountRepositoryMockRecorder) AddAccountBalance(ctx, tx, accountID, amount interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAccountBalance", reflect.TypeOf((*MockAccountRepository)(nil).AddAccountBalance), ctx, tx, accountID, amount)
 }
 
 // FindByID mocks base method.

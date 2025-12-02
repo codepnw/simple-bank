@@ -55,6 +55,7 @@ func Run(cfg *config.EnvConfig) error {
 	}
 	routes.registerUserRoutes()
 	routes.registerAccountRoutes()
+	routes.registerTransferRoutes()
 
 	return r.Run()
 }

@@ -25,3 +25,10 @@ var (
 	ErrTokenExpires  = errors.New("token is expires")
 	ErrUnauthorized  = errors.New("unauthorized")
 )
+
+// Transfer
+var (
+	ErrCurrencyMismatch = errors.New("currency mismatch")
+	ErrMoneyNotEnough   = errors.New("money not enough")
+	ErrTransferToSelf   = errors.New("transfer to self")
+)

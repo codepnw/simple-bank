@@ -14,6 +14,9 @@ type AccountRepository interface {
 	Insert(ctx context.Context, input *account.Account) (*account.Account, error)
 	FindByID(ctx context.Context, accountID int64) (*account.Account, error)
 	List(ctx context.Context, ownerID int64, limit, offset int) ([]*account.Account, error)
+
+	// Transaction
+	AddAccountBalance(ctx context.Context, tx *sql.Tx, accountID, amount int64) (*account.Account, error)
 }
 
 type accountRepository struct {
@@ -95,4 +98,23 @@ func (r *accountRepository) List(ctx context.Context, ownerID int64, limit int, 
 		return nil, err
 	}
 	return accs, nil
+}
+
+func (r *accountRepository) AddAccountBalance(ctx context.Context, tx *sql.Tx, accountID int64, amount int64) (*account.Account, error) {
+	query := `
+		UPDATE accounts SET balance = balance + $1 WHERE id = $2
+		RETURNING id, owner_id, balance, currency, created_at
+	`
+	acc := new(account.Account)
+	err := tx.QueryRowContext(ctx, query, amount, accountID).Scan(
+		&acc.ID,
+		&acc.OwnerID,
+		&acc.Balance,
+		&acc.Currency,
+		&acc.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return acc, nil
 }
