@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -45,8 +46,11 @@ type txManager struct {
 	db *sql.DB
 }
 
-func NewTransaction(db *sql.DB) TxManager {
-	return &txManager{db: db}
+func NewTransaction(db *sql.DB) (TxManager, error) {
+	if db == nil {
+		return nil, errors.New("db is nil")
+	}
+	return &txManager{db: db}, nil
 }
 
 func (t *txManager) WithTransaction(ctx context.Context, fn func(tx *sql.Tx) error) (err error) {

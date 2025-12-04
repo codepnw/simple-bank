@@ -9,8 +9,14 @@ import (
 )
 
 type EnvConfig struct {
-	DB  DBConfig  `envPrefix:"DB_"`
-	JWT JWTConfig `envPrefix:"JWT_"`
+	Server ServerConfig `envPrefix:"SERVER_"`
+	DB     DBConfig     `envPrefix:"DB_"`
+	JWT    JWTConfig    `envPrefix:"JWT_"`
+}
+
+type ServerConfig struct {
+	HTTPAddr string `env:"HTTP_ADDRESS" envDefault:"localhost:8080"`
+	GrpcAddr string `env:"GRPC_ADDRESS" envDefault:"localhost:9090"`
 }
 
 type DBConfig struct {

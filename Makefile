@@ -6,6 +6,11 @@ MIGRATE_PATH = ./pkg/database/migrations
 run:
 	@go run cmd/api/main.go
 
+protoc:
+	@protoc --go_out=pb --go_opt=paths=source_relative \
+    --go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+    proto/*.proto
+
 # ------------------------ Start Migrate -----------------------
 # Example: make migrate-create name=example
 migrate-create:
