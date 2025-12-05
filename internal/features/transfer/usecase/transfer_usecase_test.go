@@ -4,15 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/codepnw/simple-bank/internal/features/account"
 	accountrepository "github.com/codepnw/simple-bank/internal/features/account/repository"
 	"github.com/codepnw/simple-bank/internal/features/entry"
 	entryrepository "github.com/codepnw/simple-bank/internal/features/entry/repository"
-	"github.com/codepnw/simple-bank/internal/features/transfer"
 	transferrepository "github.com/codepnw/simple-bank/internal/features/transfer/repository"
 	transferusecase "github.com/codepnw/simple-bank/internal/features/transfer/usecase"
 	"github.com/codepnw/simple-bank/internal/mocks"
 	"github.com/codepnw/simple-bank/pkg/auth"
+	"github.com/codepnw/simple-bank/pkg/utils/errs"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,7 +26,7 @@ func TestTransfer(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "success",
+			name: "success FromID < ToID",
 			input: &transferusecase.TransferParams{
 				FromAccountID: 1,
 				ToAccountID:   2,
@@ -35,60 +34,307 @@ func TestTransfer(t *testing.T) {
 				Currency:      "THB",
 			},
 			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
-				mockFromAcc := &account.Account{
-					ID:       1,
-					OwnerID:  10,
-					Balance:  100,
-					Currency: "THB",
-				}
-				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(mockFromAcc, nil).Times(1)
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
 
-				mockToAcc := &account.Account{
-					ID:       2,
-					OwnerID:  11,
-					Balance:  0,
-					Currency: "THB",
-				}
-				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(mockToAcc, nil).Times(1)
+				toAcc := mocks.MockAccountData()
+				toAcc.OwnerID = 100
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
 
-				mockTransInput := &transfer.Transfer{
-					FromAccountID: input.FromAccountID,
-					ToAccountID:   input.ToAccountID,
-					Amount:        input.Amount,
-				}
-				mockTrans := &transfer.Transfer{
-					ID:            1,
-					FromAccountID: 1,
-					ToAccountID:   2,
-					Amount:        10,
-				}
-				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), mockTransInput).Return(mockTrans, nil).Times(1)
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
 
-				mockEntFrom := &entry.Entry{
-					AccountID: 1,
-					Amount:    -10,
-				}
-				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockEntFrom, nil).Times(1)
+				mockFromEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: -input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockFromEnt, nil).Times(1)
 
-				mockEntTo := &entry.Entry{
-					AccountID: 2,
-					Amount:    10,
-				}
-				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockEntTo, nil).Times(1)
+				mockToEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockToEnt, nil).Times(1)
 
-				mockAcc1 := &account.Account{
-					ID:      1,
-					Balance: 90,
-				}
-				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.FromAccountID, -input.Amount).Return(mockAcc1, nil).Times(1)
+				addFromAcc := mocks.MockAccountData()
+				addFromAcc.Balance += -input.Amount
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.FromAccountID, -input.Amount).Return(addFromAcc, nil).Times(1)
 
-				mockAcc2 := &account.Account{
-					ID:      2,
-					Balance: 10,
-				}
-				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.ToAccountID, input.Amount).Return(mockAcc2, nil).Times(1)
+				addToAcc := mocks.MockAccountData()
+				addToAcc.Balance += input.Amount
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.ToAccountID, input.Amount).Return(addToAcc, nil).Times(1)
 			},
 			expectedErr: nil,
+		},
+		{
+			name: "success FromID > ToID",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 3,
+				ToAccountID:   2,
+				Amount:        10,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.OwnerID = 100
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
+
+				mockFromEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: -input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockFromEnt, nil).Times(1)
+
+				mockToEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockToEnt, nil).Times(1)
+
+				addToAcc := mocks.MockAccountData()
+				addToAcc.Balance += input.Amount
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.ToAccountID, input.Amount).Return(addToAcc, nil).Times(1)
+
+				addFromAcc := mocks.MockAccountData()
+				addFromAcc.Balance += -input.Amount
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.FromAccountID, -input.Amount).Return(addFromAcc, nil).Times(1)
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "fail transfer to self",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   1,
+				Amount:        10,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+			},
+			expectedErr: errs.ErrTransferToSelf,
+		},
+		{
+			name: "fail user no account",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        10,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				a := mocks.MockAccountData()
+				a.OwnerID = 100
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(a, nil).Times(1)
+			},
+			expectedErr: errs.ErrAccountNotFound,
+		},
+		{
+			name: "fail get from account",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        10,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail get to account",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				fromAcc.Balance = 20
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail currency not equal",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.Currency = "USD"
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+			},
+			expectedErr: errs.ErrCurrencyMismatch,
+		},
+		{
+			name: "fail currency mismatch",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        10,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				a := mocks.MockAccountData()
+				a.Currency = "USD"
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(a, nil).Times(1)
+			},
+			expectedErr: errs.ErrCurrencyMismatch,
+		},
+		{
+			name: "fail money not enough",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				fromAcc.Balance = 20
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				toAcc.OwnerID = 100
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+			},
+			expectedErr: errs.ErrMoneyNotEnough,
+		},
+		{
+			name: "fail insert transfer",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail insert from account entry",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
+
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail insert to account entry",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
+
+				mockEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: -input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockEnt, nil).Times(1)
+
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail add acc1 balance",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
+
+				mockFromEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: -input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockFromEnt, nil).Times(1)
+
+				mockToEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockToEnt, nil).Times(1)
+
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.FromAccountID, -input.Amount).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
+		},
+		{
+			name: "fail add acc2 balance",
+			input: &transferusecase.TransferParams{
+				FromAccountID: 1,
+				ToAccountID:   2,
+				Amount:        100,
+				Currency:      "THB",
+			},
+			mockFn: func(tranRepo *transferrepository.MockTransferRepository, accRepo *accountrepository.MockAccountRepository, entRepo *entryrepository.MockEntryRepository, input *transferusecase.TransferParams) {
+				fromAcc := mocks.MockAccountData()
+				accRepo.EXPECT().FindByID(gomock.Any(), input.FromAccountID).Return(fromAcc, nil).Times(1)
+
+				toAcc := mocks.MockAccountData()
+				toAcc.ID = 2
+				accRepo.EXPECT().FindByID(gomock.Any(), input.ToAccountID).Return(toAcc, nil).Times(1)
+
+				mockTrans := mocks.MockTransferData(input)
+				tranRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockTrans, nil).Times(1)
+
+				mockFromEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: -input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockFromEnt, nil).Times(1)
+
+				mockToEnt := &entry.Entry{AccountID: input.FromAccountID, Amount: input.Amount}
+				entRepo.EXPECT().Insert(gomock.Any(), gomock.Any(), gomock.Any()).Return(mockToEnt, nil).Times(1)
+
+				addFromAcc := mocks.MockAccountData()
+				addFromAcc.Balance += -input.Amount
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.FromAccountID, -input.Amount).Return(addFromAcc, nil).Times(1)
+
+				accRepo.EXPECT().AddAccountBalance(gomock.Any(), gomock.Any(), input.ToAccountID, input.Amount).Return(nil, mocks.ErrDatabase).Times(1)
+			},
+			expectedErr: mocks.ErrDatabase,
 		},
 	}
 

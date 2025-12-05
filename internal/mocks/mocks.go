@@ -7,6 +7,8 @@ import (
 	"errors"
 
 	"github.com/codepnw/simple-bank/internal/features/account"
+	"github.com/codepnw/simple-bank/internal/features/transfer"
+	transferusecase "github.com/codepnw/simple-bank/internal/features/transfer/usecase"
 	"github.com/codepnw/simple-bank/internal/features/user"
 )
 
@@ -47,7 +49,16 @@ func MockAccountData() *account.Account {
 	return &account.Account{
 		ID:       10,
 		OwnerID:  10,
-		Balance:  0,
+		Balance:  1000,
 		Currency: "THB",
+	}
+}
+
+func MockTransferData(input *transferusecase.TransferParams) *transfer.Transfer {
+	return &transfer.Transfer{
+		ID:            1,
+		FromAccountID: input.FromAccountID,
+		ToAccountID:   input.ToAccountID,
+		Amount:        input.Amount,
 	}
 }
