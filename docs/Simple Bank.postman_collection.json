@@ -1,0 +1,935 @@
+{
+	"info": {
+		"_postman_id": "dbf3b80d-ca14-4d34-bfaf-8d21afd53e5e",
+		"name": "Simple Bank",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3017048"
+	},
+	"item": [
+		{
+			"name": "USER",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"test1\",\n    \"password\": \"123456\",\n    \"first_name\": \"john\",\n    \"last_name\": \"doe\",\n    \"email\": \"test@mail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{default}}/auth/register",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"demo1@mail.com\",\n    \"username\": \"demo1\",\n    \"password\": \"123456\",\n    \"first_name\": \"john\",\n    \"last_name\": \"doe\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/register",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:21:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "494"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 201,\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjUyMDAxMTIsImlhdCI6MTc2NTExMzcxMn0.TeTwbyGxChQe57yALxW5bRfhjsnoLHk8HVfbWNwiMQU\",\n        \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU3MTg1MTIsImlhdCI6MTc2NTExMzcxMn0.p_UWtox_nHhFzm9_IkGNcGrvFUN7BNquBVuxWOIiIm8\"\n    },\n    \"message\": \"created\"\n}"
+						},
+						{
+							"name": "400 Exists",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"demo1@mail.com\",\n    \"username\": \"demo1\",\n    \"password\": \"123456\",\n    \"first_name\": \"john\",\n    \"last_name\": \"doe\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/register",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:22:38 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "69"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 400,\n    \"message\": \"username already exists\",\n    \"type\": \"BAD_REQUEST\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json()",
+									"",
+									"pm.environment.set(\"access_token\", res.data.access_token)",
+									"pm.environment.set(\"refresh_token\", res.data.refresh_token)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test5@mail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{default}}/auth/login",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"demo1@mail.com\",\n    \"password\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/login",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:23:57 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "499"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjUyMDAyMzcsImlhdCI6MTc2NTExMzgzN30.a-11BbIGpdTBjjXhf_bqRykwuufx_tjR32sytMhs6NU\",\n        \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU3MTg2MzcsImlhdCI6MTc2NTExMzgzN30.mGezg9oYHarEpXk4Ajp27JlzG6-1nspjz59L7oDzZrk\"\n    },\n    \"message\": \"successfully\"\n}"
+						},
+						{
+							"name": "400 Invalid Credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"demo11@mail.com\",\n    \"password\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/login",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:24:15 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "71"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 400,\n    \"message\": \"invalid email or password\",\n    \"type\": \"BAD_REQUEST\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjI3LCJFbWFpbCI6InRlc3Q1QG1haWwuY29tIiwiaXNzIjoic2ltcGxlLWJhbmstYXBpIiwiZXhwIjoxNzY1MTEzMTEyLCJpYXQiOjE3NjQ1MDgzMTJ9.uWlnEPzcK4eoehPvwMrHEDeeZZlYMq3ypil1dhlOYlo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{default}}/auth/refresh-token",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"auth",
+								"refresh-token"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU3MTg2MzcsImlhdCI6MTc2NTExMzgzN30.mGezg9oYHarEpXk4Ajp27JlzG6-1nspjz59L7oDzZrk\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/refresh-token",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"refresh-token"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:26:25 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "499"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjUyMDAzODUsImlhdCI6MTc2NTExMzk4NX0.rpafQpdw4HnL-sW5DiD74XdRLPmtwDXOv_A9FabqZm0\",\n        \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU3MTg3ODUsImlhdCI6MTc2NTExMzk4NX0.TNODF20nUjSLJbvyqYKHvi9b8ZBN5LkmYoNaxpxrdd4\"\n    },\n    \"message\": \"successfully\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjUyMDAyMzcsImlhdCI6MTc2NTExMzgzN30.a-11BbIGpdTBjjXhf_bqRykwuufx_tjR32sytMhs6NU\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/refresh-token",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"refresh-token"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:25:42 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 404,\n    \"message\": \"token not found\",\n    \"type\": \"NOT_FOUND\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test11@mail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{default}}/auth/login",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "204 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjUsIkVtYWlsIjoiZGVtbzFAbWFpbC5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU3MTg3ODUsImlhdCI6MTc2NTExMzk4NX0.TNODF20nUjSLJbvyqYKHvi9b8ZBN5LkmYoNaxpxrdd4\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/logout",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:28:39 GMT"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjI3LCJFbWFpbCI6InRlc3Q1QG1haWwuY29tIiwiaXNzIjoic2ltcGxlLWJhbmstYXBpIiwiZXhwIjoxNzY1MTY2ODIyLCJpYXQiOjE3NjQ1NjIwMjJ9.u1I5lmiDoGxGDoBbp5HLq0EtG8_zWBpffRAMr0sg2OA\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/auth/logout",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:27:58 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 404,\n    \"message\": \"token not found\",\n    \"type\": \"NOT_FOUND\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ACCOUNT",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "201 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/accounts",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:30:04 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "176"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 201,\n    \"data\": {\n        \"id\": 6,\n        \"owner_id\": 5,\n        \"balance\": 0,\n        \"currency\": \"USD\",\n        \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n        \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n    },\n    \"message\": \"created\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{default}}/accounts",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"accounts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{default}}/accounts/6",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts",
+										"6"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:31:53 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "181"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": {\n        \"id\": 6,\n        \"owner_id\": 5,\n        \"balance\": 0,\n        \"currency\": \"USD\",\n        \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n        \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n    },\n    \"message\": \"successfully\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{default}}/accounts/66",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts",
+										"66"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:32:26 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "61"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 404,\n    \"message\": \"account not found\",\n    \"type\": \"NOT_FOUND\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{default}}/accounts",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"accounts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{default}}/accounts?size=ss",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "ss"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:31:18 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "183"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": [\n        {\n            \"id\": 6,\n            \"owner_id\": 5,\n            \"balance\": 0,\n            \"currency\": \"USD\",\n            \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n            \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n        }\n    ],\n    \"message\": \"successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "TRANSFER",
+			"item": [
+				{
+					"name": "Transfer",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from_account_id\": 6,\n    \"to_account_id\": 2,\n    \"amount\": 15,\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/transfers",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"transfers"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:37:27 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "637"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": {\n        \"transfer\": {\n            \"id\": 1,\n            \"from_account_id\": 6,\n            \"to_account_id\": 2,\n            \"amount\": 15,\n            \"created_at\": \"2025-12-07T13:37:27.815941Z\"\n        },\n        \"from_account\": {\n            \"id\": 2,\n            \"owner_id\": 1,\n            \"balance\": 115,\n            \"currency\": \"USD\",\n            \"created_at\": \"2025-12-07T12:53:33.161912Z\",\n            \"updated_at\": \"0001-01-01T00:00:00Z\"\n        },\n        \"to_account\": {\n            \"id\": 6,\n            \"owner_id\": 5,\n            \"balance\": 85,\n            \"currency\": \"USD\",\n            \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n            \"updated_at\": \"0001-01-01T00:00:00Z\"\n        },\n        \"from_entry\": {\n            \"id\": 1,\n            \"account_id\": 6,\n            \"amount\": -15,\n            \"created_at\": \"2025-12-07T13:37:27.815941Z\"\n        },\n        \"to_entry\": {\n            \"id\": 2,\n            \"account_id\": 2,\n            \"amount\": 15,\n            \"created_at\": \"2025-12-07T13:37:27.815941Z\"\n        }\n    },\n    \"message\": \"transfer success\"\n}"
+						},
+						{
+							"name": "400 Currency Mismatch",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from_account_id\": 6,\n    \"to_account_id\": 3,\n    \"amount\": 5,\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/transfers",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"transfers"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:33:55 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "63"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 400,\n    \"message\": \"currency mismatch\",\n    \"type\": \"BAD_REQUEST\"\n}"
+						},
+						{
+							"name": "400 Money Not Enough",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from_account_id\": 6,\n    \"to_account_id\": 2,\n    \"amount\": 5,\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/transfers",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"transfers"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:34:36 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 400,\n    \"message\": \"money not enough\",\n    \"type\": \"BAD_REQUEST\"\n}"
+						},
+						{
+							"name": "404 Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"from_account_id\": 5,\n    \"to_account_id\": 3,\n    \"amount\": 5,\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/transfers",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"transfers"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:33:28 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "61"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 404,\n    \"message\": \"account not found\",\n    \"type\": \"NOT_FOUND\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
