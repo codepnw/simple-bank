@@ -1,10 +1,17 @@
-include dev.env
+include .env
 
 MIGRATE_DB = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSL_MODE)
 MIGRATE_PATH = ./pkg/database/migrations
 
 run:
 	@go run cmd/api/main.go
+
+docker-up:
+	@docker compose up --build -d
+
+# Clear data
+docker-clear:
+	@docker compsoe down -v
 
 protoc:
 	@protoc --go_out=pb --go_opt=paths=source_relative \
