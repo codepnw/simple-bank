@@ -15,6 +15,18 @@ func NewTransferHandler(uc transferusecase.TransferUsecase) *transferHandler {
 	return &transferHandler{uc: uc}
 }
 
+// @Summary Create Transfer
+// @Description user create transfer
+// @Tags transfers
+// @Accept       json
+// @Produce      json
+// @Param request body TransferReq true "Create Transfer Data"
+// @Success 201 {object} transferusecase.TransferResult "Create Transfer Successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid Input"
+// @Failure 404 {object} response.ErrorResponse "Account Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /transfers [post]
 func (h *transferHandler) CreateTransfer(c *gin.Context) {
 	req := new(TransferReq)
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -48,5 +60,5 @@ func (h *transferHandler) CreateTransfer(c *gin.Context) {
 			return
 		}
 	}
-	response.Success(c, "transfer success", result)
+	response.Created(c, "transfer success", result)
 }

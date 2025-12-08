@@ -20,36 +20,65 @@ import (
 	"github.com/codepnw/simple-bank/pkg/database"
 	"github.com/codepnw/simple-bank/pkg/jwt"
 	"github.com/codepnw/simple-bank/pkg/utils/response"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+
+	_ "github.com/codepnw/simple-bank/docs/swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type routesConfig struct {
 	db     *sql.DB
 	router *gin.Engine
+	prefix string
 	token  *jwt.JWTToken
 	tx     database.TxManager
 	mid    *middleware.AuthMiddleware
+}
+
+func setupRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	// New Router
+	r := gin.New()
+
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization", "X-Requested-With"}
+	corsConfig.ExposeHeaders = []string{"Content-Length"}
+	corsConfig.AllowCredentials = true
+
+	r.Use(cors.New(corsConfig))
+
+	r.GET("/health", func(c *gin.Context) {
+		response.Success(c, "server running...", nil)
+	})
+	// API Docs
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	return r
 }
 
 func RunHTTPServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, token *jwt.JWTToken) error {
 	// New Middleware
 	mid := middleware.NewMiddleware(token)
 
-	// New Router
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-	r.GET("/health", func(c *gin.Context) {
-		response.Success(c, "server running...", nil)
-	})
+	// Setup Router
+	router := setupRouter()
 
 	// Config Routes
 	routes := &routesConfig{
-		router: r,
+		router: router,
+		prefix: cfg.Server.HTTPPrefix,
 		token:  token,
 		db:     db,
 		tx:     tx,
@@ -59,8 +88,10 @@ func RunHTTPServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, tok
 	routes.registerAccountRoutes()
 	routes.registerTransferRoutes()
 
-	log.Printf("start HTTP server at %v", cfg.Server.HTTPAddr)
-	return r.Run()
+	addr := cfg.Server.HTTPAddr
+	log.Printf("start HTTP docs at %s/swagger/index.html", addr)
+	log.Printf("start HTTP server at %s%s", addr, routes.prefix)
+	return router.Run(addr)
 }
 
 // ================ gRPC Server ====================

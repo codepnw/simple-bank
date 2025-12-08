@@ -20,17 +20,22 @@ func NewAccountHandler(uc accountusecase.AccountUsecase) *accountHandler {
 	return &accountHandler{uc: uc}
 }
 
+// @Summary Create Account
+// @Description user create account
+// @Tags accounts
+// @Accept       json
+// @Produce      json
+// @Param request body CreateAccountReq true "Create Account Data"
+// @Success 201 {object} account.Account "Create Account Successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid Input"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 404 {object} response.ErrorResponse "Account Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /accounts [post]
 func (h *accountHandler) CreateAccount(c *gin.Context) {
-	type currencyReq struct {
-		Currency string `json:"currency" validate:"required,oneof=THB thb USD usd"`
-	}
-
-	req := new(currencyReq)
+	req := new(CreateAccountReq)
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
-	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -55,6 +60,19 @@ func (h *accountHandler) CreateAccount(c *gin.Context) {
 	response.Created(c, "", data)
 }
 
+// @Summary Get Account
+// @Description get account by id
+// @Tags accounts
+// @Accept       json
+// @Produce      json
+// @Param id path int true "Account ID"
+// @Success 200 {object} account.Account "Get Account Successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid Input"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 404 {object} response.ErrorResponse "Account Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /accounts/{id} [get]
 func (h *accountHandler) GetAccount(c *gin.Context) {
 	id, err := helper.ParseInt64(c.Param(consts.ParamAccountID))
 	if err != nil {
@@ -76,6 +94,18 @@ func (h *accountHandler) GetAccount(c *gin.Context) {
 	response.Success(c, "", data)
 }
 
+// @Summary List Accounts
+// @Description list account by user
+// @Tags accounts
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param size query int false "Page size"
+// @Success 200 {array} account.Account "List Accounts Successfully"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /accounts [get]
 func (h *accountHandler) ListAccounts(c *gin.Context) {
 	page := helper.ParseInt(c.Query("page"))
 	size := helper.ParseInt(c.Query("size"))

@@ -16,8 +16,8 @@ func (cfg *routesConfig) registerTransferRoutes() {
 	uc := transferusecase.NewTransferUsecase(tranRepo, accRepo, entRepo, cfg.tx)
 	handler := transferhandler.NewTransferHandler(uc)
 
-	r := cfg.router.Group("/transfers", cfg.mid.Authorized())
+	r := cfg.router.Group(cfg.prefix+"/transfers", cfg.mid.Authorized())
 	{
-		r.POST("/", handler.CreateTransfer)
+		r.POST("", handler.CreateTransfer)
 	}
 }

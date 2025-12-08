@@ -7,7 +7,6 @@ import (
 	userusecase "github.com/codepnw/simple-bank/internal/features/user/usecase"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
 	"github.com/codepnw/simple-bank/pkg/utils/response"
-	"github.com/codepnw/simple-bank/pkg/utils/helper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,13 +18,19 @@ func NewUserHandler(uc userusecase.UserUsecase) *userHandler {
 	return &userHandler{uc: uc}
 }
 
+// @Summary Register
+// @Description user register
+// @Tags users
+// @Accept       json
+// @Produce      json
+// @Param request body RegisterReq true "User Registration Data"
+// @Success 201 {object} userusecase.TokenResponse "User created successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid input"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Router /auth/register [post]
 func (h *userHandler) Register(c *gin.Context) {
 	req := new(RegisterReq)
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
-	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -54,13 +59,19 @@ func (h *userHandler) Register(c *gin.Context) {
 	response.Created(c, "", data)
 }
 
+// @Summary Login
+// @Description user login
+// @Tags users
+// @Accept       json
+// @Produce      json
+// @Param request body LoginReq true "User Login Data"
+// @Success 200 {object} userusecase.TokenResponse "User login successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid input"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Router /auth/login [post]
 func (h *userHandler) Login(c *gin.Context) {
 	req := new(LoginReq)
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
-	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -77,13 +88,21 @@ func (h *userHandler) Login(c *gin.Context) {
 	response.Success(c, "", data)
 }
 
+// @Summary Refresh Token
+// @Description user refresh token
+// @Tags users
+// @Accept       json
+// @Produce      json
+// @Param request body RefreshTokenReq true "User Refresh Token Data"
+// @Success 200 {object} userusecase.TokenResponse "Refresh Token successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid input"
+// @Failure 404 {object} response.ErrorResponse "Token Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /users/refresh-token [post]
 func (h *userHandler) RefreshToken(c *gin.Context) {
 	req := new(RefreshTokenReq)
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
-	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
@@ -108,13 +127,21 @@ func (h *userHandler) RefreshToken(c *gin.Context) {
 	response.Success(c, "", data)
 }
 
+// @Summary Logout
+// @Description user logout
+// @Tags users
+// @Accept       json
+// @Produce      json
+// @Param request body RefreshTokenReq true "User Logout Data"
+// @Success 204 {object} response.NoContentResponse "successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid input"
+// @Failure 404 {object} response.ErrorResponse "Token Not Found"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Security     BearerAuth
+// @Router /users/logout [post]
 func (h *userHandler) Logout(c *gin.Context) {
 	req := new(RefreshTokenReq)
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
-	if err := helper.Validate(req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}

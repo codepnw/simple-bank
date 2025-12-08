@@ -12,10 +12,10 @@ func (cfg *routesConfig) registerAccountRoutes() {
 	uc := accountusecase.NewAccountUsecase(repo)
 	handler := accounthandler.NewAccountHandler(uc)
 
-	r := cfg.router.Group("/accounts", cfg.mid.Authorized())
+	r := cfg.router.Group(cfg.prefix+"/accounts", cfg.mid.Authorized())
 	{
-		r.POST("/", handler.CreateAccount)
+		r.POST("", handler.CreateAccount)
 		r.GET("/:"+consts.ParamAccountID, handler.GetAccount)
-		r.GET("/", handler.ListAccounts)
+		r.GET("", handler.ListAccounts)
 	}
 }

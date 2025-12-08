@@ -9,6 +9,9 @@ run:
 docker-up:
 	@docker compose up --build -d
 
+swag:
+	@swag init -g cmd/api/main.go -o docs/swagger
+
 # Clear data
 docker-clear:
 	@docker compsoe down -v

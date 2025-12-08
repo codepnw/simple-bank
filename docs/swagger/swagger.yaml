@@ -1,0 +1,453 @@
+definitions:
+  account.Account:
+    properties:
+      balance:
+        type: integer
+      created_at:
+        type: string
+      currency:
+        $ref: '#/definitions/account.AccountCurrency'
+      id:
+        type: integer
+      owner_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  account.AccountCurrency:
+    enum:
+    - THB
+    - USD
+    type: string
+    x-enum-varnames:
+    - CurrencyTHB
+    - CurrencyUSD
+  accounthandler.CreateAccountReq:
+    properties:
+      currency:
+        enum:
+        - THB
+        - thb
+        - USD
+        - usd
+        example: THB
+        type: string
+    required:
+    - currency
+    type: object
+  entry.Entry:
+    properties:
+      account_id:
+        type: integer
+      amount:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  response.NoContentResponse:
+    type: object
+  transfer.Transfer:
+    properties:
+      amount:
+        type: integer
+      created_at:
+        type: string
+      from_account_id:
+        type: integer
+      id:
+        type: integer
+      to_account_id:
+        type: integer
+    type: object
+  transferhandler.TransferReq:
+    properties:
+      amount:
+        example: 10
+        type: integer
+      currency:
+        enum:
+        - THB
+        - USD
+        example: THB
+        type: string
+      from_account_id:
+        example: 1
+        minimum: 1
+        type: integer
+      to_account_id:
+        example: 2
+        minimum: 1
+        type: integer
+    required:
+    - amount
+    - currency
+    - from_account_id
+    - to_account_id
+    type: object
+  transferusecase.TransferResult:
+    properties:
+      from_account:
+        $ref: '#/definitions/account.Account'
+      from_entry:
+        $ref: '#/definitions/entry.Entry'
+      to_account:
+        $ref: '#/definitions/account.Account'
+      to_entry:
+        $ref: '#/definitions/entry.Entry'
+      transfer:
+        $ref: '#/definitions/transfer.Transfer'
+    type: object
+  userhandler.LoginReq:
+    properties:
+      email:
+        example: user1@mail.com
+        type: string
+      password:
+        example: "123456"
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  userhandler.RefreshTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  userhandler.RegisterReq:
+    properties:
+      email:
+        example: john@mail.com
+        type: string
+      first_name:
+        example: john
+        type: string
+      last_name:
+        example: doe
+        type: string
+      password:
+        example: pass1234
+        minLength: 6
+        type: string
+      username:
+        example: johndoe
+        minLength: 4
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - username
+    type: object
+  userusecase.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: A robust banking API managing accounts and transfers.
+  title: Simple Bank API
+  version: "1.0"
+paths:
+  /accounts:
+    get:
+      consumes:
+      - application/json
+      description: list account by user
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List Accounts Successfully
+          schema:
+            items:
+              $ref: '#/definitions/account.Account'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List Accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: user create account
+      parameters:
+      - description: Create Account Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/accounthandler.CreateAccountReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Create Account Successfully
+          schema:
+            $ref: '#/definitions/account.Account'
+        "400":
+          description: Invalid Input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Account Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Account
+      tags:
+      - accounts
+  /accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get account by id
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Get Account Successfully
+          schema:
+            $ref: '#/definitions/account.Account'
+        "400":
+          description: Invalid Input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Account Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Account
+      tags:
+      - accounts
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: user login
+      parameters:
+      - description: User Login Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/userhandler.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login successfully
+          schema:
+            $ref: '#/definitions/userusecase.TokenResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login
+      tags:
+      - users
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: user register
+      parameters:
+      - description: User Registration Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/userhandler.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/userusecase.TokenResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register
+      tags:
+      - users
+  /transfers:
+    post:
+      consumes:
+      - application/json
+      description: user create transfer
+      parameters:
+      - description: Create Transfer Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/transferhandler.TransferReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Create Transfer Successfully
+          schema:
+            $ref: '#/definitions/transferusecase.TransferResult'
+        "400":
+          description: Invalid Input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Account Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Transfer
+      tags:
+      - transfers
+  /users/logout:
+    post:
+      consumes:
+      - application/json
+      description: user logout
+      parameters:
+      - description: User Logout Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/userhandler.RefreshTokenReq'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: successfully
+          schema:
+            $ref: '#/definitions/response.NoContentResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Token Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - users
+  /users/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: user refresh token
+      parameters:
+      - description: User Refresh Token Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/userhandler.RefreshTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Refresh Token successfully
+          schema:
+            $ref: '#/definitions/userusecase.TokenResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Token Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Refresh Token
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

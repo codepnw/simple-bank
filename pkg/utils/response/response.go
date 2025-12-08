@@ -6,6 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ErrorResponse : swagger response
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+// NoContentResponse : swagger response
+type NoContentResponse struct{}
+
 func Success(c *gin.Context, message string, data any) {
 	if message == "" {
 		message = "successfully"

@@ -15,8 +15,9 @@ type EnvConfig struct {
 }
 
 type ServerConfig struct {
-	HTTPAddr string `env:"HTTP_ADDRESS" envDefault:"localhost:8080"`
-	GrpcAddr string `env:"GRPC_ADDRESS" envDefault:"localhost:9090"`
+	HTTPAddr   string `env:"HTTP_ADDRESS" envDefault:"localhost:8080"`
+	HTTPPrefix string `env:"HTTP_PREFIX" envDefault:"/api/v1"`
+	GrpcAddr   string `env:"GRPC_ADDRESS" envDefault:"localhost:9090"`
 }
 
 type DBConfig struct {
