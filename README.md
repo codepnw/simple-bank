@@ -67,11 +67,11 @@ The API Server will start at
 The database comes pre-filled with the following accounts for testing concurrency and transfers:
 
 
-| Email | Password | Initial Balance (Raw) | Display Value | Currency |
-| :---  | :---     | :---                  | :---          | :---     |
-| **`user1@example.com`** | `123456` | `500000` | **5,000.00** | THB  |
-| **`user2@example.com`** | `123456` | `0`      | **0.00**     | THB  |
-| **`rich@example.com`**    | `123456` | `100000000` | **1,000,000.00** | THB |
+| Email                   | Password | Initial Balance (Raw) | Display Value    | Currency | Account ID     |
+| :---                    | :---     | :---                  | :---             | :---     | :---           |
+| **`user1@example.com`** | `123456` | `500000`              | **5,000.00**     | THB      | **1, 2 (USD)** |
+| **`user2@example.com`** | `123456` | `0`                   | **0.00**         | THB      | **3**          |
+| **`rich@example.com`**  | `123456` | `100000000`           | **1,000,000.00** | THB      | **4**          |
 
 ### 💰 Currency & Amount Handling
 
