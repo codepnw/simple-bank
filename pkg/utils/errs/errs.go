@@ -12,8 +12,9 @@ var (
 
 // Account
 var (
-	ErrAccountNotFound = errors.New("account not found")
-	ErrInvalidCurrency = errors.New("invalid account currency ['THB', 'USD']")
+	ErrAccountNotFound       = errors.New("account not found")
+	ErrCurrencyAlreadyExists = errors.New("account with this currency already exists")
+	ErrInvalidCurrency       = errors.New("invalid account currency ['THB', 'USD']")
 )
 
 // Auth

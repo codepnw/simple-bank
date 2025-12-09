@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"test1\",\n    \"password\": \"123456\",\n    \"first_name\": \"john\",\n    \"last_name\": \"doe\",\n    \"email\": \"test@mail.com\"\n}",
+							"raw": "{\n    \"email\": \"demo1@mail.com\",\n    \"username\": \"demo1\",\n    \"password\": \"123456\",\n    \"first_name\": \"john\",\n    \"last_name\": \"doe\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -150,7 +150,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"test5@mail.com\",\n    \"password\": \"123456\"\n}",
+							"raw": "{\n    \"email\": \"user1@example.com\",\n    \"password\": \"123456\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -268,7 +268,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjI3LCJFbWFpbCI6InRlc3Q1QG1haWwuY29tIiwiaXNzIjoic2ltcGxlLWJhbmstYXBpIiwiZXhwIjoxNzY1MTEzMTEyLCJpYXQiOjE3NjQ1MDgzMTJ9.uWlnEPzcK4eoehPvwMrHEDeeZZlYMq3ypil1dhlOYlo\"\n}",
+							"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIkVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU4OTQ0NjIsImlhdCI6MTc2NTI4OTY2Mn0.ASgt8SLb6G-SbCjAEV0i0yhWntOmLSkGoKHdeYS8tmk\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -276,12 +276,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{default}}/auth/refresh-token",
+							"raw": "{{default}}/users/refresh-token",
 							"host": [
 								"{{default}}"
 							],
 							"path": [
-								"auth",
+								"users",
 								"refresh-token"
 							]
 						}
@@ -386,7 +386,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"test11@mail.com\",\n    \"password\": \"123456\"\n}",
+							"raw": "{\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIkVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJpc3MiOiJzaW1wbGUtYmFuay1hcGkiLCJleHAiOjE3NjU4OTQ0OTgsImlhdCI6MTc2NTI4OTY5OH0.P2P-HAYQ0wHIxRNiCJwImX52oa4OYje2oWy63yFJBdY\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -394,13 +394,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{default}}/auth/login",
+							"raw": "{{default}}/users/logout",
 							"host": [
 								"{{default}}"
 							],
 							"path": [
-								"auth",
-								"login"
+								"users",
+								"logout"
 							]
 						}
 					},
@@ -548,6 +548,126 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"code\": 201,\n    \"data\": {\n        \"id\": 6,\n        \"owner_id\": 5,\n        \"balance\": 0,\n        \"currency\": \"USD\",\n        \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n        \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n    },\n    \"message\": \"created\"\n}"
+						},
+						{
+							"name": "400 Currency Exists",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currency\": \"USD\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{default}}/accounts",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 09 Dec 2025 13:36:55 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "87"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 400,\n    \"message\": \"account with this currency already exists\",\n    \"type\": \"BAD_REQUEST\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{default}}/accounts",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"accounts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "ss",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{default}}/accounts?size=ss",
+									"host": [
+										"{{default}}"
+									],
+									"path": [
+										"accounts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "ss"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 07 Dec 2025 13:31:18 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "183"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"data\": [\n        {\n            \"id\": 6,\n            \"owner_id\": 5,\n            \"balance\": 0,\n            \"currency\": \"USD\",\n            \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n            \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n        }\n    ],\n    \"message\": \"successfully\"\n}"
 						}
 					]
 				},
@@ -640,70 +760,6 @@
 							"body": "{\n    \"code\": 404,\n    \"message\": \"account not found\",\n    \"type\": \"NOT_FOUND\"\n}"
 						}
 					]
-				},
-				{
-					"name": "List",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{default}}/accounts",
-							"host": [
-								"{{default}}"
-							],
-							"path": [
-								"accounts"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "200 Success",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{default}}/accounts?size=ss",
-									"host": [
-										"{{default}}"
-									],
-									"path": [
-										"accounts"
-									],
-									"query": [
-										{
-											"key": "page",
-											"value": "1",
-											"disabled": true
-										},
-										{
-											"key": "size",
-											"value": "ss"
-										}
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": null,
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Date",
-									"value": "Sun, 07 Dec 2025 13:31:18 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "183"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"code\": 200,\n    \"data\": [\n        {\n            \"id\": 6,\n            \"owner_id\": 5,\n            \"balance\": 0,\n            \"currency\": \"USD\",\n            \"created_at\": \"2025-12-07T13:30:04.197291Z\",\n            \"updated_at\": \"2025-12-07T13:30:04.197291Z\"\n        }\n    ],\n    \"message\": \"successfully\"\n}"
-						}
-					]
 				}
 			]
 		},
@@ -713,8 +769,26 @@
 				{
 					"name": "Transfer",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"from_account_id\": 1,\n    \"to_account_id\": 3,\n    \"amount\": 20000,\n    \"currency\": \"THB\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{default}}/transfers",
+							"host": [
+								"{{default}}"
+							],
+							"path": [
+								"transfers"
+							]
+						}
 					},
 					"response": [
 						{

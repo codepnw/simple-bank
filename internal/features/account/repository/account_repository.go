@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/codepnw/simple-bank/internal/features/account"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
+	"github.com/lib/pq"
 )
 
 //go:generate mockgen -source=account_repository.go -destination=mock_account_repository.go -package=accountrepository
@@ -38,6 +40,11 @@ func (r *accountRepository) Insert(ctx context.Context, input *account.Account) 
 		&input.UpdatedAt,
 	)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code.Name() == "unique_violation" && strings.Contains(pqErr.Constraint, "idx_accounts_owner_currency") {
+				return nil, errs.ErrCurrencyAlreadyExists
+			}
+		}
 		return nil, err
 	}
 	return input, nil

@@ -49,6 +49,9 @@ func (h *accountHandler) CreateAccount(c *gin.Context) {
 		case errs.ErrInvalidCurrency:
 			response.BadRequest(c, err.Error())
 			return
+		case errs.ErrCurrencyAlreadyExists:
+			response.BadRequest(c, err.Error())
+			return
 		case errs.ErrAccountNotFound:
 			response.NotFound(c, err.Error())
 			return
