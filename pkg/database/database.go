@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/codepnw/simple-bank/pkg/config"
 	_ "github.com/lib/pq"
@@ -32,9 +33,24 @@ func ConnectPostgres(cfg *config.DBConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("open db failed: %w", err)
 	}
 
-	if err = db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping db failed: %w", err)
+	counts := 0
+	for {
+		err := db.Ping()
+		if err == nil {
+			log.Println("connect database successfully")
+			break
+		}
+
+		if counts >= 15 {
+			// > 30 sec (15 * 2)
+			return nil, fmt.Errorf("failed to connect database after retries: %w", err)
+		}
+
+		log.Printf("database not ready retrying in 2 seconds (%d/15)", counts+1)
+		time.Sleep(2 * time.Second)
+		counts++
 	}
+
 	return db, err
 }
 
