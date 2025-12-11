@@ -12,6 +12,7 @@ type EnvConfig struct {
 	Server ServerConfig `envPrefix:"SERVER_"`
 	DB     DBConfig     `envPrefix:"DB_"`
 	JWT    JWTConfig    `envPrefix:"JWT_"`
+	Paseto PasetoConfig `envPrefix:"PASETO_"`
 }
 
 type ServerConfig struct {
@@ -32,6 +33,10 @@ type DBConfig struct {
 type JWTConfig struct {
 	SecretKey  string `env:"SECRET_KEY" validate:"required"`
 	RefreshKey string `env:"REFRESH_KEY" validate:"required"`
+}
+
+type PasetoConfig struct {
+	SymmetricKey string `env:"SYMMETRIC_KEY" validate:"required,len=32"`
 }
 
 func LoadEnv(path string) (*EnvConfig, error) {

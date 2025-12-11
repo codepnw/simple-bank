@@ -18,7 +18,7 @@ import (
 	"github.com/codepnw/simple-bank/pkg/auth"
 	"github.com/codepnw/simple-bank/pkg/config"
 	"github.com/codepnw/simple-bank/pkg/database"
-	"github.com/codepnw/simple-bank/pkg/jwt"
+	"github.com/codepnw/simple-bank/pkg/token"
 	"github.com/codepnw/simple-bank/pkg/utils/response"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -37,7 +37,7 @@ type routesConfig struct {
 	db     *sql.DB
 	router *gin.Engine
 	prefix string
-	token  *jwt.JWTToken
+	token  token.TokenMaker
 	tx     database.TxManager
 	mid    *middleware.AuthMiddleware
 }
@@ -68,7 +68,7 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
-func RunHTTPServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, token *jwt.JWTToken) error {
+func RunHTTPServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, token token.TokenMaker) error {
 	// New Middleware
 	mid := middleware.NewMiddleware(token)
 
@@ -96,7 +96,7 @@ func RunHTTPServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, tok
 
 // ================ gRPC Server ====================
 
-func RunGrpcServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, token *jwt.JWTToken) error {
+func RunGrpcServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, token token.TokenMaker) error {
 	tranRepo := transferrepository.NewTransferRepository(db)
 	accRepo := accountrepository.NewAccountRepository(db)
 	entRepo := entryrepository.NewEntryRepository(db)
@@ -125,7 +125,7 @@ func RunGrpcServer(cfg *config.EnvConfig, db *sql.DB, tx database.TxManager, tok
 	return nil
 }
 
-func unaryServerInterceptor(token *jwt.JWTToken) grpc.UnaryServerInterceptor {
+func unaryServerInterceptor(token token.TokenMaker) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {

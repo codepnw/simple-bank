@@ -6,18 +6,18 @@ import (
 
 	"github.com/codepnw/simple-bank/internal/consts"
 	"github.com/codepnw/simple-bank/internal/features/user"
-	"github.com/codepnw/simple-bank/pkg/jwt"
+	"github.com/codepnw/simple-bank/pkg/token"
 )
 
 func GetCurrentUser(ctx context.Context) (*user.User, error) {
-	claims, ok := ctx.Value(consts.ContextUserClaimsKey).(*jwt.UserClaims)
+	payload, ok := ctx.Value(consts.ContextUserClaimsKey).(*token.Payload)
 	if !ok {
 		return nil, errors.New("invalid user context")
 	}
 
 	usr := &user.User{
-		ID:    claims.UserID,
-		Email: claims.Email,
+		ID:    payload.UserID,
+		Email: payload.Email,
 	}
 	return usr, nil
 }

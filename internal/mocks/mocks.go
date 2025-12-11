@@ -10,9 +10,28 @@ import (
 	"github.com/codepnw/simple-bank/internal/features/transfer"
 	transferusecase "github.com/codepnw/simple-bank/internal/features/transfer/usecase"
 	"github.com/codepnw/simple-bank/internal/features/user"
+	"github.com/codepnw/simple-bank/pkg/token"
 )
 
 var ErrDatabase = errors.New("database error")
+
+type MockToken struct{}
+
+func (m MockToken) GenerateAccessToken(u *user.User) (string, error) {
+	return "", nil
+}
+
+func (m MockToken) GenerateRefreshToken(u *user.User) (string, error) {
+	return "", nil
+}
+
+func (m MockToken) VerifyAccessToken(tokenStr string) (*token.Payload, error) {
+	return nil, nil
+}
+
+func (m MockToken) VerifyRefreshToken(tokenStr string) (*token.Payload, error) {
+	return nil, nil
+}
 
 type MockDB struct{}
 

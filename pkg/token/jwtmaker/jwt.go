@@ -1,4 +1,4 @@
-package jwt
+package jwtmaker
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 	"github.com/codepnw/simple-bank/internal/consts"
 	"github.com/codepnw/simple-bank/internal/features/user"
 	"github.com/codepnw/simple-bank/pkg/config"
+	"github.com/codepnw/simple-bank/pkg/token"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -16,7 +17,7 @@ type JWTToken struct {
 	refreshKey string
 }
 
-func InitJWT(cfg *config.JWTConfig) (*JWTToken, error) {
+func NewJWTMaker(cfg *config.JWTConfig) (token.TokenMaker, error) {
 	if cfg.SecretKey == "" || cfg.RefreshKey == "" {
 		return nil, errors.New("key is empty")
 	}
@@ -26,7 +27,7 @@ func InitJWT(cfg *config.JWTConfig) (*JWTToken, error) {
 	}, nil
 }
 
-type UserClaims struct {
+type userClaims struct {
 	UserID int64
 	Email  string
 	*jwt.RegisteredClaims
@@ -41,7 +42,7 @@ func (j *JWTToken) GenerateRefreshToken(u *user.User) (string, error) {
 }
 
 func (j *JWTToken) generateToken(key string, u *user.User, duration time.Duration) (string, error) {
-	claims := &UserClaims{
+	claims := &userClaims{
 		UserID: u.ID,
 		Email:  u.Email,
 		RegisteredClaims: &jwt.RegisteredClaims{
@@ -59,29 +60,36 @@ func (j *JWTToken) generateToken(key string, u *user.User, duration time.Duratio
 	return ss, nil
 }
 
-func (j *JWTToken) VerifyAccessToken(tokenStr string) (*UserClaims, error) {
+func (j *JWTToken) VerifyAccessToken(tokenStr string) (*token.Payload, error) {
 	return j.verifyToken(j.secretKey, tokenStr)
 }
 
-func (j *JWTToken) VerifyRefreshToken(tokenStr string) (*UserClaims, error) {
+func (j *JWTToken) VerifyRefreshToken(tokenStr string) (*token.Payload, error) {
 	return j.verifyToken(j.refreshKey, tokenStr)
 }
 
-func (j *JWTToken) verifyToken(key, tokenStr string) (*UserClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &UserClaims{}, func(t *jwt.Token) (any, error) {
+func (j *JWTToken) verifyToken(key, tokenStr string) (*token.Payload, error) {
+	t, err := jwt.ParseWithClaims(tokenStr, &userClaims{}, func(t *jwt.Token) (any, error) {
 		return []byte(key), nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	claims, ok := token.Claims.(*UserClaims)
+	claims, ok := t.Claims.(*userClaims)
 	if !ok {
 		return nil, errors.New("invalid token")
 	}
-	if claims.ExpiresAt != nil && time.Now().After(claims.ExpiresAt.Time) {
-		return nil, errors.New("token expires")
+
+	payload := &token.Payload{
+		UserID:    claims.UserID,
+		Email:     claims.Email,
+		IssuedAt:  claims.IssuedAt.Time,
+		ExpiredAt: claims.ExpiresAt.Time,
 	}
 
-	return claims, nil
+	if err = payload.Valid(); err != nil {
+		return nil, err
+	}
+	return payload, nil
 }

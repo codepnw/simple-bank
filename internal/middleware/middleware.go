@@ -6,16 +6,16 @@ import (
 	"strings"
 
 	"github.com/codepnw/simple-bank/internal/consts"
-	"github.com/codepnw/simple-bank/pkg/jwt"
+	"github.com/codepnw/simple-bank/pkg/token"
 	"github.com/codepnw/simple-bank/pkg/utils/response"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthMiddleware struct {
-	token *jwt.JWTToken
+	token token.TokenMaker
 }
 
-func NewMiddleware(token *jwt.JWTToken) *AuthMiddleware {
+func NewMiddleware(token token.TokenMaker) *AuthMiddleware {
 	return &AuthMiddleware{token: token}
 }
 

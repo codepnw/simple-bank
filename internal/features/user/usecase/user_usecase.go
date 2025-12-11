@@ -11,7 +11,7 @@ import (
 	"github.com/codepnw/simple-bank/internal/features/user"
 	userrepository "github.com/codepnw/simple-bank/internal/features/user/repository"
 	"github.com/codepnw/simple-bank/pkg/database"
-	"github.com/codepnw/simple-bank/pkg/jwt"
+	"github.com/codepnw/simple-bank/pkg/token"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
 	"github.com/codepnw/simple-bank/pkg/utils/helper"
 )
@@ -25,11 +25,11 @@ type UserUsecase interface {
 
 type userUsecase struct {
 	repo  userrepository.UserRepository
-	token *jwt.JWTToken
+	token token.TokenMaker
 	tx    database.TxManager
 }
 
-func NewUserUsecase(repo userrepository.UserRepository, token *jwt.JWTToken, tx database.TxManager) UserUsecase {
+func NewUserUsecase(repo userrepository.UserRepository, token token.TokenMaker, tx database.TxManager) UserUsecase {
 	return &userUsecase{
 		repo:  repo,
 		token: token,

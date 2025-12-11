@@ -4,8 +4,8 @@ import "time"
 
 // Token Duration
 const (
-	JWTAccessTokenDuration  = time.Hour * 24
-	JWTRefreshTokenDuration = time.Hour * 24 * 7
+	TokenAccessDuration  = time.Hour * 1
+	TokenRefreshDuration = time.Hour * 24 * 7
 )
 
 type contextKey string

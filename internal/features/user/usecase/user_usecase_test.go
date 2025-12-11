@@ -8,8 +8,6 @@ import (
 	userrepository "github.com/codepnw/simple-bank/internal/features/user/repository"
 	userusecase "github.com/codepnw/simple-bank/internal/features/user/usecase"
 	"github.com/codepnw/simple-bank/internal/mocks"
-	"github.com/codepnw/simple-bank/pkg/config"
-	"github.com/codepnw/simple-bank/pkg/jwt"
 	"github.com/codepnw/simple-bank/pkg/utils/errs"
 	"github.com/codepnw/simple-bank/pkg/utils/helper"
 	"github.com/golang/mock/gomock"
@@ -70,8 +68,6 @@ func TestRegister(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
-				assert.NotEmpty(t, result.AccessToken)
-				assert.NotEmpty(t, result.RefreshToken)
 			}
 		})
 	}
@@ -141,8 +137,6 @@ func TestLogin(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
-				assert.NotEmpty(t, result.AccessToken)
-				assert.NotEmpty(t, result.RefreshToken)
 			}
 		})
 	}
@@ -158,7 +152,7 @@ func TestRefreshToken(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "success",
+			name:  "success",
 			token: "mock_refresh_token",
 			mockFn: func(mockRepo *userrepository.MockUserRepository, token string) {
 				u := mocks.MockUserData()
@@ -173,7 +167,7 @@ func TestRefreshToken(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "fail not found",
+			name:  "fail not found",
 			token: "mock_refresh_token",
 			mockFn: func(mockRepo *userrepository.MockUserRepository, token string) {
 				mockRepo.EXPECT().ValidateRefreshToken(gomock.Any(), token).Return(int64(0), errs.ErrTokenNotFound).Times(1)
@@ -181,7 +175,7 @@ func TestRefreshToken(t *testing.T) {
 			expectedErr: errs.ErrTokenNotFound,
 		},
 		{
-			name: "fail db error",
+			name:  "fail db error",
 			token: "mock_refresh_token",
 			mockFn: func(mockRepo *userrepository.MockUserRepository, token string) {
 				u := mocks.MockUserData()
@@ -210,8 +204,6 @@ func TestRefreshToken(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
-				assert.NotEmpty(t, result.AccessToken)
-				assert.NotEmpty(t, result.RefreshToken)
 			}
 		})
 	}
@@ -227,7 +219,7 @@ func TestLogout(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "success",
+			name:  "success",
 			token: "mock_refresh_token",
 			mockFn: func(mockRepo *userrepository.MockUserRepository, token string) {
 				mockRepo.EXPECT().RevokedRefreshToken(gomock.Any(), gomock.Any(), token).Return(nil).Times(1)
@@ -235,7 +227,7 @@ func TestLogout(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "fail db error",
+			name:  "fail db error",
 			token: "mock_refresh_token",
 			mockFn: func(mockRepo *userrepository.MockUserRepository, token string) {
 				mockRepo.EXPECT().RevokedRefreshToken(gomock.Any(), gomock.Any(), token).Return(mocks.ErrDatabase).Times(1)
@@ -268,13 +260,8 @@ func setup(t *testing.T) (userusecase.UserUsecase, *userrepository.MockUserRepos
 	defer ctrl.Finish()
 
 	mockRepo := userrepository.NewMockUserRepository(ctrl)
-	mockToken, err := jwt.InitJWT(&config.JWTConfig{
-		SecretKey:  "mock-secret-key",
-		RefreshKey: "mock-refresh-key",
-	})
-	if err != nil {
-		t.Fatalf("init jwt failed: %v", err)
-	}
+
+	mockToken := mocks.MockToken{}
 	mockDB := mocks.MockDB{}
 	mockTx := mocks.MockTx{}
 

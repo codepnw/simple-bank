@@ -9,7 +9,9 @@ import (
 	"github.com/codepnw/simple-bank/internal/server"
 	"github.com/codepnw/simple-bank/pkg/config"
 	"github.com/codepnw/simple-bank/pkg/database"
-	"github.com/codepnw/simple-bank/pkg/jwt"
+	"github.com/codepnw/simple-bank/pkg/token"
+	"github.com/codepnw/simple-bank/pkg/token/jwtmaker"
+	"github.com/codepnw/simple-bank/pkg/token/pasetomaker"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -55,7 +57,7 @@ func main() {
 type appContainer struct {
 	db    *sql.DB
 	tx    database.TxManager
-	token *jwt.JWTToken
+	token token.TokenMaker
 }
 
 func initialize(cfg *config.EnvConfig) (*appContainer, func(), error) {
@@ -72,11 +74,19 @@ func initialize(cfg *config.EnvConfig) (*appContainer, func(), error) {
 		return nil, nil, fmt.Errorf("failed init tx: %v", err)
 	}
 
-	// Init JWT
-	token, err := jwt.InitJWT(&cfg.JWT)
+	// New Token : JWT
+	jwtToken, err := jwtmaker.NewJWTMaker(&cfg.JWT)
 	if err != nil {
 		db.Close()
 		return nil, nil, fmt.Errorf("failed init jwt: %v", err)
+	}
+	_ = jwtToken
+
+	// New Token : PASETO
+	pasetoToken, err := pasetomaker.NewPasetoMaker(cfg.Paseto.SymmetricKey)
+	if err != nil {
+		db.Close()
+		return nil, nil, fmt.Errorf("failed init paseto: %v", err)
 	}
 
 	cleanup := func() {
@@ -86,8 +96,8 @@ func initialize(cfg *config.EnvConfig) (*appContainer, func(), error) {
 	}
 
 	return &appContainer{
-		db: db,
-		tx: tx,
-		token: token,
+		db:    db,
+		tx:    tx,
+		token: pasetoToken, // Change Token PASETO or JWT
 	}, cleanup, nil
 }
