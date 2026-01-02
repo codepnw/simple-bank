@@ -6,6 +6,9 @@ MIGRATE_PATH = ./pkg/database/migrations
 run:
 	@go run cmd/api/main.go
 
+test:
+	@go test ./internal/features/*/usecase -cover
+
 docker-up:
 	@docker compose up --build -d
 

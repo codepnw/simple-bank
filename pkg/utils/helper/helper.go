@@ -26,9 +26,9 @@ func ComparePassword(hashedPassword, password string) error {
 	return nil
 }
 
-// Validate : validate handler request
+// Validate
+var v = validator.New()
 func Validate(input any) error {
-	v := validator.New()
 	return v.Struct(input)
 }
 

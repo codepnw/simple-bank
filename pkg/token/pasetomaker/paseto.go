@@ -28,11 +28,11 @@ func NewPasetoMaker(symmetricKey string) (token.TokenMaker, error) {
 }
 
 func (p *PasetoMaker) GenerateAccessToken(u *user.User) (string, error) {
-	return p.generateToken(u, consts.JWTAccessTokenDuration)
+	return p.generateToken(u, consts.TokenAccessDuration)
 }
 
 func (p *PasetoMaker) GenerateRefreshToken(u *user.User) (string, error) {
-	return p.generateToken(u, consts.JWTRefreshTokenDuration)
+	return p.generateToken(u, consts.TokenRefreshDuration)
 }
 
 func (p *PasetoMaker) VerifyAccessToken(tokenStr string) (*token.Payload, error) {

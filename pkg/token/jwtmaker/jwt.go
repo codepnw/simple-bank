@@ -34,11 +34,11 @@ type userClaims struct {
 }
 
 func (j *JWTToken) GenerateAccessToken(u *user.User) (string, error) {
-	return j.generateToken(j.secretKey, u, consts.JWTAccessTokenDuration)
+	return j.generateToken(j.secretKey, u, consts.TokenAccessDuration)
 }
 
 func (j *JWTToken) GenerateRefreshToken(u *user.User) (string, error) {
-	return j.generateToken(j.refreshKey, u, consts.JWTRefreshTokenDuration)
+	return j.generateToken(j.refreshKey, u, consts.TokenRefreshDuration)
 }
 
 func (j *JWTToken) generateToken(key string, u *user.User, duration time.Duration) (string, error) {

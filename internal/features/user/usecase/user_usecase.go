@@ -65,7 +65,7 @@ func (u *userUsecase) Register(ctx context.Context, input *user.User) (*TokenRes
 		err = u.repo.SaveRefreshToken(ctx, tx, &user.Auth{
 			UserID:    userData.ID,
 			Token:     resp.RefreshToken,
-			ExpiresAt: time.Now().Add(consts.JWTRefreshTokenDuration),
+			ExpiresAt: time.Now().Add(consts.TokenRefreshDuration),
 		})
 		if err != nil {
 			return err
@@ -108,7 +108,7 @@ func (u *userUsecase) Login(ctx context.Context, email, pwd string) (*TokenRespo
 		err = u.repo.SaveRefreshToken(ctx, tx, &user.Auth{
 			UserID:    userData.ID,
 			Token:     resp.RefreshToken,
-			ExpiresAt: time.Now().Add(consts.JWTRefreshTokenDuration),
+			ExpiresAt: time.Now().Add(consts.TokenRefreshDuration),
 		})
 		if err != nil {
 			return err
@@ -154,7 +154,7 @@ func (u *userUsecase) RefreshToken(ctx context.Context, refreshToken string) (*T
 		err = u.repo.SaveRefreshToken(ctx, tx, &user.Auth{
 			UserID:    userData.ID,
 			Token:     resp.RefreshToken,
-			ExpiresAt: time.Now().Add(consts.JWTRefreshTokenDuration),
+			ExpiresAt: time.Now().Add(consts.TokenRefreshDuration),
 		})
 		if err != nil {
 			return err
